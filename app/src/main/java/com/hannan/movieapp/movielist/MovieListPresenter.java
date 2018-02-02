@@ -2,14 +2,12 @@ package com.hannan.movieapp.movielist;
 
 
 import com.hannan.movieapp.api.APIResponse;
-import com.hannan.movieapp.api.Movie;
 import com.hannan.movieapp.api.MovieService;
 import com.hannan.movieapp.api.ServiceCallback;
 import com.hannan.movieapp.common.BasePresenter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 

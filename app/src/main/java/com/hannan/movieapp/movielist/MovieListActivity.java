@@ -1,7 +1,10 @@
 package com.hannan.movieapp.movielist;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,7 +65,11 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
 
                 //If end date is already applied, call the filter method to update the list.
                 if (filterEndDate != null) {
-                    movieListPresenter.applyDateFilter(filterStartDate, filterEndDate);
+                    if (isInternetConnected()) {
+                        movieListPresenter.applyDateFilter(filterStartDate, filterEndDate);
+                    } else {
+                        showError(getString(R.string.internet_connection_issue));
+                    }
                 }
             }
         }, year, month, day).show();
@@ -87,9 +94,13 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
 
                 //If start date is already applied, call the filter method to update the list.
                 if (filterStartDate != null) {
-                    movieListPresenter.applyDateFilter(filterStartDate, filterEndDate);
+                    if (isInternetConnected()) {
+                        movieListPresenter.applyDateFilter(filterStartDate, filterEndDate);
+                    } else {
+                        showError(getString(R.string.internet_connection_issue));
+                    }
                 } else {
-                    Toast.makeText(MovieListActivity.this, R.string.error_start_date, Toast.LENGTH_SHORT).show();
+                    showError(getString(R.string.error_start_date));
                 }
             }
         }, year, month, day).show();
@@ -101,7 +112,11 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
         setContentView(R.layout.activity_movie_list);
         ButterKnife.bind(this);
         initializeUI();
-        movieListPresenter.fetchListOfMovies();
+        if (isInternetConnected()) {
+            movieListPresenter.fetchListOfMovies();
+        } else {
+            showError(getString(R.string.internet_connection_issue));
+        }
     }
 
     private void initializeUI() {
@@ -125,9 +140,13 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
                 int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
                 int visibleThreshold = 3;
 
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold) && totalItemCount<totalResultCount) {
-                    movieListPresenter.fetchListOfMovies();
-                    isLoading = true;
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold) && totalItemCount < totalResultCount) {
+                    if (isInternetConnected()) {
+                        movieListPresenter.fetchListOfMovies();
+                        isLoading = true;
+                    } else {
+                        showError(getString(R.string.internet_connection_issue));
+                    }
                 }
             }
         });
@@ -148,7 +167,7 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
         //If the first page is populated, clear the old data.
         //this is applicable when you apply filter dates
         this.totalResultCount = totalCount;
-        if(page == 1){
+        if (page == 1) {
             this.movies.clear();
         }
         this.movies.addAll(movies);
@@ -169,6 +188,14 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
     @Override
     public void dismissProgressDialog() {
         super.dismissProgressDialog();
+    }
+
+    public boolean isInternetConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
 }

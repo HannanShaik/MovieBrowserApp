@@ -2,11 +2,13 @@ package com.hannan.movieapp.api;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by hannanshaik on 02/02/18.
  */
 
-public class Movie {
+public class Movie implements Serializable{
 
     @SerializedName("vote_count")
     private int voteCount;
@@ -14,10 +16,14 @@ public class Movie {
     private String title;
     @SerializedName("poster_path")
     private String imagePath;
+    @SerializedName("backdrop_path")
+    private String backdropPath;
     @SerializedName("original_language")
     private String language;
     @SerializedName("overview")
     private String overview;
+    @SerializedName("release_date")
+    private String releaseDate;
 
     public int getVoteCount() {
         return voteCount;
@@ -48,5 +54,13 @@ public class Movie {
                 ", language='" + language + '\'' +
                 ", overview='" + overview + '\'' +
                 '}';
+    }
+
+    public String getBackdropPath() {
+        return backdropPath;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
     }
 }

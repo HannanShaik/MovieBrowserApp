@@ -1,4 +1,4 @@
-package com.hannan.movieapp;
+package com.hannan.movieapp.movielist;
 
 
 import com.hannan.movieapp.api.Movie;
@@ -19,14 +19,15 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private String filterStartDate;
     private String filterEndDate;
 
-    public void fetchMovies(int page){
-        this.page = page;
+    public void fetchListOfMovies(){
+        this.page++;
         fetchMovies();
     }
 
     public void applyDateFilter(String startDate, String endDate){
         this.filterStartDate = startDate;
         this.filterEndDate = endDate;
+        this.page = 1;
         fetchMovies();
     }
 

@@ -1,4 +1,4 @@
-package com.hannan.movieapp;
+package com.hannan.movieapp.movielist;
 
 
 import com.hannan.movieapp.api.Movie;

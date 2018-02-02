@@ -3,6 +3,7 @@ package com.hannan.movieapp.api;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by hannanshaik on 02/02/18.

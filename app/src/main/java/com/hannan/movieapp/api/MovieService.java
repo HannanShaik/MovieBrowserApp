@@ -38,31 +38,22 @@ public class MovieService {
     public void fetchMovies(int page,
                             String filterStartDate,
                             String filterEndDate,
-                            final ServiceCallback<List<Movie>> serviceCallback){
+                            final ServiceCallback<APIResponse> serviceCallback){
 
         API api = retrofit.create(API.class);
-        Call<JsonObject> movieAPICall = api.fetchMovies(Constants.API_KEY,filterStartDate, filterEndDate, page);
+        Call<APIResponse> movieAPICall = api.fetchMovies(Constants.API_KEY,filterStartDate, filterEndDate, page);
 
-        movieAPICall.enqueue(new Callback<JsonObject>() {
+        movieAPICall.enqueue(new Callback<APIResponse>() {
             @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+            public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
                 if(response.isSuccessful()){
-                    JsonObject apiResponse = response.body();
-
-                    if(apiResponse.has("results")){
-                        Type movieType = new TypeToken<List<Movie>>(){}.getType();
-                        List<Movie> movies = new Gson().fromJson(response.body().get("results"), movieType);
-                        serviceCallback.onSuccess(movies);
-                    } else {
-                        //if the results block is missing.
-                        serviceCallback.onError(new Exception("Something went wrong"));
-                    }
+                    APIResponse apiResponse = response.body();
+                    serviceCallback.onSuccess(apiResponse);
                 } else {
                     //if the request failed.
-                    if(response.body() != null){
-                        JsonObject errorResponse = response.body();
-                        serviceCallback.onError(new Exception(errorResponse.get("status_message")
-                                .getAsString()));
+                    APIResponse errorResponse = response.body();
+                    if(errorResponse != null){
+                        serviceCallback.onError(new Exception(errorResponse.getErrorMessage()));
                     } else {
                         serviceCallback.onError(new Exception("Something went wrong"));
                     }
@@ -70,9 +61,10 @@ public class MovieService {
             }
 
             @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
+            public void onFailure(Call<APIResponse> call, Throwable t) {
                 serviceCallback.onError(new Exception(t.getMessage()));
             }
+
         });
     }
 }

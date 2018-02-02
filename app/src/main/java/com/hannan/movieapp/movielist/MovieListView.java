@@ -11,7 +11,7 @@ import java.util.List;
  */
 
 public interface MovieListView extends BaseView {
-    void populateList(int page, List<Movie> movies);
+    void populateList(int page, int totalCount, List<Movie> movies);
     void showError(String message);
     void showProgressDialog(String message);
     void dismissProgressDialog();

@@ -1,6 +1,7 @@
 package com.hannan.movieapp.movielist;
 
 
+import com.hannan.movieapp.api.APIResponse;
 import com.hannan.movieapp.api.Movie;
 import com.hannan.movieapp.api.MovieService;
 import com.hannan.movieapp.api.ServiceCallback;
@@ -9,30 +10,33 @@ import com.hannan.movieapp.common.BasePresenter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
  * Created by hannanshaik on 02/02/18.
  */
 
-public class MovieListPresenter extends BasePresenter<MovieListView> {
+class MovieListPresenter extends BasePresenter<MovieListView> {
 
-    private int page = 1;
+    private int page = 0;
     private String filterStartDate;
     private String filterEndDate;
 
-    public void fetchListOfMovies(){
+    void fetchListOfMovies(){
         this.page++;
         fetchMovies();
     }
 
-    public void applyDateFilter(Date startDate, Date endDate){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    void applyDateFilter(Date startDate, Date endDate){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         if(startDate.after(endDate)){
             getView().showError("Start date cannot be greater than End date");
         } else {
             this.filterStartDate = sdf.format(startDate);
             this.filterEndDate = sdf.format(endDate);
+
+            //reset the page count
             this.page = 1;
             fetchMovies();
         }
@@ -41,11 +45,11 @@ public class MovieListPresenter extends BasePresenter<MovieListView> {
     private void fetchMovies() {
         getView().showProgressDialog("Loading...");
         MovieService movieService = new MovieService();
-        movieService.fetchMovies(this.page, this.filterStartDate, this.filterEndDate, new ServiceCallback<List<Movie>>() {
+        movieService.fetchMovies(this.page, this.filterStartDate, this.filterEndDate, new ServiceCallback<APIResponse>() {
             @Override
-            public void onSuccess(List<Movie> movies) {
+            public void onSuccess(APIResponse apiResponse) {
                 getView().dismissProgressDialog();
-                getView().populateList(page, movies);
+                getView().populateList(page, apiResponse.getTotalResults(), apiResponse.getMovies());
             }
 
             @Override

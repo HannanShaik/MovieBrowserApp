@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,10 +40,8 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
     private List<Movie> movies;
     private Date filterStartDate;
     private Date filterEndDate;
-    private int lastVisibleItem;
-    private int totalItemCount;
-    private int visibleThreshold = 3;
     public boolean isLoading;
+    private int totalResultCount;
 
     @OnClick(R.id.btnFilterStartDate)
     public void onFilterStartDateSelection() {
@@ -58,8 +57,10 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
                 calendar.set(year, month, dayOfMonth);
                 filterStartDate = calendar.getTime();
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-                startDateButton.setText("Start Date: " + sdf.format(filterStartDate));
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+                startDateButton.setText(getString(R.string.start_date_label, sdf.format(filterStartDate)));
+
+                //If end date is already applied, call the filter method to update the list.
                 if (filterEndDate != null) {
                     movieListPresenter.applyDateFilter(filterStartDate, filterEndDate);
                 }
@@ -81,12 +82,14 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
                 calendar.set(year, month, dayOfMonth);
                 filterEndDate = calendar.getTime();
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-                endDateButton.setText("End Date: " + sdf.format(filterEndDate));
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+                endDateButton.setText(getString(R.string.end_date_label, sdf.format(filterEndDate)));
+
+                //If start date is already applied, call the filter method to update the list.
                 if (filterStartDate != null) {
                     movieListPresenter.applyDateFilter(filterStartDate, filterEndDate);
                 } else {
-                    Toast.makeText(MovieListActivity.this, "Please select the filter from date", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MovieListActivity.this, R.string.error_start_date, Toast.LENGTH_SHORT).show();
                 }
             }
         }, year, month, day).show();
@@ -97,46 +100,54 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
         ButterKnife.bind(this);
+        initializeUI();
+        movieListPresenter.fetchListOfMovies();
+    }
 
+    private void initializeUI() {
         movies = new ArrayList<>();
-        adapter = new MovieListAdapter(this, movies);
+
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        movieRecyclerView.setLayoutManager(linearLayoutManager);
+
+        adapter = new MovieListAdapter(movies);
         movieRecyclerView.setAdapter(adapter);
 
         movieListPresenter = new MovieListPresenter();
         movieListPresenter.attachView(this);
 
-        movieRecyclerView.setLayoutManager(linearLayoutManager);
         movieRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                totalItemCount = linearLayoutManager.getItemCount();
-                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                System.out.println(totalItemCount);
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                int totalItemCount = linearLayoutManager.getItemCount();
+                int lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                int visibleThreshold = 3;
+
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold) && totalItemCount<totalResultCount) {
                     movieListPresenter.fetchListOfMovies();
                     isLoading = true;
                 }
             }
         });
 
+        //set on click listener for the item click on movie listing.
         adapter.setMovieItemClickListener(new MovieListAdapter.MovieItemClickListener() {
             @Override
             public void onClick(int position) {
-                //move to new screen
                 Intent intent = new Intent(MovieListActivity.this, MovieDetailsActivity.class);
                 intent.putExtra("movie", movies.get(position));
                 startActivity(intent);
             }
         });
-
-        movieListPresenter.fetchListOfMovies();
     }
 
     @Override
-    public void populateList(int page, List<Movie> movies) {
+    public void populateList(int page, int totalCount, List<Movie> movies) {
+        //If the first page is populated, clear the old data.
+        //this is applicable when you apply filter dates
+        this.totalResultCount = totalCount;
         if(page == 1){
             this.movies.clear();
         }

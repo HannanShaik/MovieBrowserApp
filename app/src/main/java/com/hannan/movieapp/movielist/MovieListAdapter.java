@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hannan.movieapp.R;
+import com.hannan.movieapp.api.Constants;
 import com.hannan.movieapp.api.Movie;
 import com.squareup.picasso.Picasso;
 
@@ -24,27 +25,24 @@ import butterknife.ButterKnife;
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieListViewHolder>{
 
-    public List<Movie> movies = new ArrayList<Movie>();
-    Context context;
+    private List<Movie> movies = new ArrayList<Movie>();
     private MovieItemClickListener movieItemClickListener;
 
-    public MovieListAdapter(Context context, List<Movie> movieList){
-        this.context = context;
+    MovieListAdapter(List<Movie> movieList){
         this.movies = movieList;
     }
 
     @Override
     public MovieListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.layout_movie_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_movie_item, parent, false);
         return new MovieListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(MovieListViewHolder holder, int position) {
         Movie movie = movies.get(position);
-        System.out.println(holder);
         holder.movieName.setText(movie.getTitle());
-        Picasso.with(context).load("http://image.tmdb.org/t/p/w300/"+movie.getImagePath()).into(holder.moviePoster);
+        Picasso.with(holder.itemView.getContext()).load(Constants.IMAGE_BASE_URL+movie.getImagePath()).into(holder.moviePoster);
     }
 
     @Override
@@ -52,7 +50,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         return movies.size();
     }
 
-    public void setMovieItemClickListener(MovieItemClickListener movieItemClickListener) {
+    void setMovieItemClickListener(MovieItemClickListener movieItemClickListener) {
         this.movieItemClickListener = movieItemClickListener;
     }
 
@@ -63,7 +61,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         @BindView(R.id.ivMoviePoster)
         ImageView moviePoster;
 
-        public MovieListViewHolder(View itemView) {
+        MovieListViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(new View.OnClickListener() {

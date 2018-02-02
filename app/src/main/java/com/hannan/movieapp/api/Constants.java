@@ -7,4 +7,5 @@ package com.hannan.movieapp.api;
 public interface Constants {
     String BASE_URL = "https://api.themoviedb.org/3/";
     String API_KEY = "7f9d32c1148368b02fc27a76eba5414d";
+    String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w300/";
 }

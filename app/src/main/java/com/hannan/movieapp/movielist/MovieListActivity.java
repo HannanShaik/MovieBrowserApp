@@ -26,9 +26,6 @@ import butterknife.OnClick;
 
 public class MovieListActivity extends BaseActivity implements MovieListView {
 
-    private Date filterStartDate;
-    private Date filterEndDate;
-
     @BindView(R.id.rvMovies)
     RecyclerView movieRecyclerView;
     @BindView(R.id.btnFilterStartDate)
@@ -36,14 +33,16 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
     @BindView(R.id.btnFilterEndDate)
     Button endDateButton;
 
-    private List<Movie> movies;
     private MovieListAdapter adapter;
-    private int totalItemCount;
     private LinearLayoutManager linearLayoutManager;
-    private int lastVisibleItem;
-    public boolean isLoading;
-    private int visibleThreshold = 1;
     private MovieListPresenter movieListPresenter;
+    private List<Movie> movies;
+    private Date filterStartDate;
+    private Date filterEndDate;
+    private int lastVisibleItem;
+    private int totalItemCount;
+    private int visibleThreshold = 3;
+    public boolean isLoading;
 
     @OnClick(R.id.btnFilterStartDate)
     public void onFilterStartDateSelection() {

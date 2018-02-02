@@ -1,11 +1,10 @@
 package com.hannan.movieapp.moviedetails;
 
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.hannan.movieapp.R;
 import com.hannan.movieapp.api.Movie;
 import com.hannan.movieapp.common.BaseActivity;

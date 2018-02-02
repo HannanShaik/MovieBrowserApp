@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -29,14 +28,21 @@ public class MovieService {
                 .build();
     }
 
+    /**
+     * Fetch the list of movies from the API
+     * @param page - Page Number
+     * @param filterStartDate
+     * @param filterEndDate
+     * @param serviceCallback
+     */
     public void fetchMovies(int page,
                             String filterStartDate,
                             String filterEndDate,
                             final ServiceCallback<List<Movie>> serviceCallback){
 
-        System.out.println(page);
         API api = retrofit.create(API.class);
         Call<JsonObject> movieAPICall = api.fetchMovies(Constants.API_KEY,filterStartDate, filterEndDate, page);
+
         movieAPICall.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -48,17 +54,16 @@ public class MovieService {
                         List<Movie> movies = new Gson().fromJson(response.body().get("results"), movieType);
                         serviceCallback.onSuccess(movies);
                     } else {
-                        System.out.println("here");
+                        //if the results block is missing.
                         serviceCallback.onError(new Exception("Something went wrong"));
                     }
                 } else {
+                    //if the request failed.
                     if(response.body() != null){
                         JsonObject errorResponse = response.body();
                         serviceCallback.onError(new Exception(errorResponse.get("status_message")
                                 .getAsString()));
                     } else {
-                        System.out.println("heresss"+ response);
-
                         serviceCallback.onError(new Exception("Something went wrong"));
                     }
                 }
@@ -66,8 +71,6 @@ public class MovieService {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                System.out.println("hesssre");
-
                 serviceCallback.onError(new Exception(t.getMessage()));
             }
         });

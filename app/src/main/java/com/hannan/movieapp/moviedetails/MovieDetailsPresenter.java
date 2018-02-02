@@ -7,9 +7,9 @@ import com.hannan.movieapp.common.BasePresenter;
  * Created by hannanshaik on 02/02/18.
  */
 
-public class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
+class MovieDetailsPresenter extends BasePresenter<MovieDetailsView> {
 
-    public void fetchAndDisplayMovieDetails(Movie movie) {
+    void fetchAndDisplayMovieDetails(Movie movie) {
         getView().populateUI(movie);
     }
 }

@@ -48,7 +48,11 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
 
     @OnClick(R.id.btnFilterStartDate)
     public void onFilterStartDateSelection() {
+        if(filterStartDate==null){
+            filterStartDate = new Date();
+        }
         final Calendar c = Calendar.getInstance();
+        c.setTime(filterStartDate);
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         final int day = c.get(Calendar.DAY_OF_MONTH);
@@ -77,7 +81,11 @@ public class MovieListActivity extends BaseActivity implements MovieListView {
 
     @OnClick(R.id.btnFilterEndDate)
     public void onFilterEndDateSelection() {
+        if(filterEndDate==null){
+            filterEndDate = new Date();
+        }
         final Calendar c = Calendar.getInstance();
+        c.setTime(filterEndDate);
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
